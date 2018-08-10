@@ -8,7 +8,6 @@ import (
 	"crypto/sha256"
 	"encoding/base64"
 	"encoding/hex"
-	"encoding/json"
 	"fmt"
 	"image/jpeg"
 	"image/png"
@@ -21,28 +20,12 @@ import (
 	"strings"
 	"time"
 
-	now "aimsis/backend/utils/now"
+	"github.com/agungdwiprasetyo/go-utils/parser"
 )
 
-// Timer is struct for calculate performance
-type Timer struct {
-	Desc      string
-	StartTime time.Time
-}
 type KeyValue struct {
 	Key   string `json:"key,omitempty"`
 	Value string `json:"value,omitempty"`
-}
-
-func NewTimer(desc string) *Timer {
-	return &Timer{Desc: desc, StartTime: time.Now()}
-}
-func (timer *Timer) Elapsed() time.Duration {
-	return time.Since(timer.StartTime)
-}
-func (timer *Timer) Print() {
-	elapsed := time.Since(timer.StartTime)
-	fmt.Printf("%s %s: %v\n", "Time elapsed", timer.Desc, elapsed)
 }
 
 func GetDateNow() string {
@@ -58,8 +41,9 @@ func GetDateString(date time.Time) string {
 	}
 	return fmt.Sprintf("%s-%s-%d", day, month, date.Year())
 }
+
 func ParseDateString(date string) string {
-	dt := now.MustParse(date)
+	dt, _ := parser.ParseTime(date)
 	return fmt.Sprintf("%d %s %d", dt.Day(), dt.Month().String(), dt.Year())
 }
 
@@ -121,28 +105,21 @@ func ConvertObjectToArray(object map[string]string) interface{} {
 	return result
 }
 
-// HashPassword is method for hashing password in database using md5->sha1 algorithms
-func HashPassword(password string) string {
-	hash1 := md5.New()
-	hash1.Write([]byte(password))
-	res1 := hex.EncodeToString(hash1.Sum(nil))
-
-	hash2 := sha1.New()
-	hash2.Write([]byte(res1))
-	result := hex.EncodeToString(hash2.Sum(nil))
-	return result
-}
-
 func MD5(str string) string {
 	hash1 := md5.New()
 	hash1.Write([]byte(str))
 	return hex.EncodeToString(hash1.Sum(nil))
 }
 
+func SHA1(str string) string {
+	hash := sha1.New()
+	hash.Write([]byte(str))
+	return hex.EncodeToString(hash.Sum(nil))
+}
+
 // ComputeHmac256 is ...
-func ComputeHmac256(str string) string {
-	secret := "mantul"
-	key := []byte(secret)
+func ComputeHmac256(str, salt string) string {
+	key := []byte(salt)
 	h := hmac.New(sha256.New, key)
 	h.Write([]byte(str))
 	return hex.EncodeToString(h.Sum(nil))
@@ -260,8 +237,7 @@ func ConvertSliceToMap(data interface{}) map[string]string {
 }
 
 func SaveFileToLocal(file multipart.File, path string) error {
-	dir := os.Getenv("APP_DIR") + path
-	out, err := os.Create(dir)
+	out, err := os.Create(path)
 	if err != nil {
 		return err
 	}
@@ -273,8 +249,7 @@ func SaveFileToLocal(file multipart.File, path string) error {
 }
 
 func ReadFileLocal(path string) (*os.File, error) {
-	dir := os.Getenv("APP_DIR") + path
-	fileRes, err := os.Open(dir)
+	fileRes, err := os.Open(path)
 	if err != nil {
 		return nil, err
 	}
@@ -282,8 +257,7 @@ func ReadFileLocal(path string) (*os.File, error) {
 }
 
 func RemoveFile(path string) error {
-	dir := os.Getenv("APP_DIR") + path
-	if err := os.Remove(dir); err != nil {
+	if err := os.Remove(path); err != nil {
 		return err
 	}
 	return nil
@@ -300,7 +274,7 @@ func DecodeImage(bs64, dest string) error {
 		return err
 	}
 
-	f, err := os.OpenFile(os.Getenv("APP_DIR")+dest, os.O_WRONLY|os.O_CREATE, 0777)
+	f, err := os.OpenFile(dest, os.O_WRONLY|os.O_CREATE, 0777)
 	if err != nil {
 		return err
 	}
@@ -316,12 +290,4 @@ func RemoveEmptyString(src []string) (res []string) {
 		}
 	}
 	return
-}
-
-func PrettyJSON(data interface{}) string {
-	buff, _ := json.Marshal(data)
-	var prettyJSON bytes.Buffer
-	json.Indent(&prettyJSON, buff, "", "\t")
-	// log.Printf("%s: %s", name, string(prettyJSON.Bytes()))
-	return fmt.Sprintf("\x1b[32;1m%s\x1b[0m", string(prettyJSON.Bytes()))
 }

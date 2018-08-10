@@ -1,7 +1,6 @@
 package debug
 
 import (
-	"aimsis/backend/utils/notification"
 	"bytes"
 	"encoding/json"
 	"fmt"
@@ -27,16 +26,6 @@ func (this *Debug) PrettyJSON(data interface{}) {
 	fmt.Println("\x1b[33;1m=======================================\x1b[0m")
 }
 
-func (this *Debug) PrintError(data ...interface{}) {
-	go notification.BackendError(data...)
-	var arr []string
-	for _, val := range data {
-		arr = append(arr, fmt.Sprint(val))
-	}
-	str := strings.Join(arr, " >>> ")
-	fmt.Printf("\x1b[31;1m%v\x1b[0m\n", str)
-}
-
 func (this *Debug) PrintRed(data interface{}) {
 	fmt.Printf("\x1b[31;1m%s >>> %v\x1b[0m\n", this.Mark, data)
 }
@@ -49,30 +38,29 @@ func PrettyJSON(data interface{}) string {
 	return fmt.Sprintf("\x1b[32;1m%s\x1b[0m", string(prettyJSON.Bytes()))
 }
 
-func PrintError(data ...interface{}) {
-	go notification.BackendError(data...)
-	var arr []string
+func StringRed(data ...interface{}) string {
+	var str []string
 	for _, val := range data {
-		arr = append(arr, fmt.Sprint(val))
+		str = append(str, fmt.Sprint(val))
 	}
-	str := strings.Join(arr, " >>> ")
-	fmt.Printf("\x1b[31;1m%v\x1b[0m\n", str)
+	return fmt.Sprintf("\x1b[31;1m%v\x1b[0m\n", strings.Join(str, " >> "))
 }
 
 func PrintRed(data ...interface{}) {
+	str := StringRed(data)
+	fmt.Printf(str)
+}
+
+func StringGreen(data ...interface{}) string {
 	var str []string
 	for _, val := range data {
 		str = append(str, fmt.Sprint(val))
 	}
-	fmt.Printf("\x1b[31;1m%v\x1b[0m\n", strings.Join(str, " >> "))
+	return fmt.Sprintf("\x1b[32;1m%v\x1b[0m\n", strings.Join(str, " >> "))
 }
 
 func PrintGreen(data ...interface{}) {
-	var str []string
-	for _, val := range data {
-		str = append(str, fmt.Sprint(val))
-	}
-	fmt.Printf("\x1b[32;1m%v\x1b[0m\n", strings.Join(str, " >> "))
+	fmt.Printf(StringGreen(data))
 }
 
 func PrintYellow(data interface{}) {
