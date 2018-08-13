@@ -19,8 +19,6 @@ import (
 	"strconv"
 	"strings"
 	"time"
-
-	"github.com/agungdwiprasetyo/go-utils/parser"
 )
 
 type KeyValue struct {
@@ -30,21 +28,6 @@ type KeyValue struct {
 
 func GetDateNow() string {
 	return strings.Split((time.Now().String()), " ")[0]
-}
-func GetDateString(date time.Time) string {
-	var day, month = fmt.Sprint(date.Day()), fmt.Sprint(int(date.Month()))
-	if date.Day() < 10 {
-		day = fmt.Sprintf("0%s", day)
-	}
-	if date.Month() < 10 {
-		month = fmt.Sprintf("0%s", month)
-	}
-	return fmt.Sprintf("%s-%s-%d", day, month, date.Year())
-}
-
-func ParseDateString(date string) string {
-	dt, _ := parser.ParseTime(date)
-	return fmt.Sprintf("%d %s %d", dt.Day(), dt.Month().String(), dt.Year())
 }
 
 // NormalizeInt untuk konversi tipe data pointer integer ke integer biasa

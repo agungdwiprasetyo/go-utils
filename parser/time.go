@@ -78,3 +78,19 @@ func ParseTime(strs ...string) (t time.Time, err error) {
 
 	return
 }
+
+func ParseDateString(date time.Time) string {
+	var day, month = fmt.Sprint(date.Day()), fmt.Sprint(int(date.Month()))
+	if date.Day() < 10 {
+		day = fmt.Sprintf("0%s", day)
+	}
+	if date.Month() < 10 {
+		month = fmt.Sprintf("0%s", month)
+	}
+	return fmt.Sprintf("%s-%s-%d", day, month, date.Year())
+}
+
+func ParseDateFormat(date string) string {
+	dt, _ := ParseTime(date)
+	return fmt.Sprintf("%d %s %d", dt.Day(), dt.Month().String(), dt.Year())
+}
