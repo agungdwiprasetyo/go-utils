@@ -63,14 +63,14 @@ func StringGreen(data ...interface{}) string {
 }
 
 func PrintRed(data ...interface{}) {
-	str := StringRed(data)
+	str := StringRed(data...)
 	fmt.Printf(str)
 }
 
 func PrintYellow(data ...interface{}) {
-	fmt.Printf("\x1b[33;1m%v\x1b[0m\n", StringYellow(data))
+	fmt.Printf("\x1b[33;1m%v\x1b[0m\n", StringYellow(data...))
 }
 
 func PrintGreen(data ...interface{}) {
-	fmt.Printf(StringGreen(data))
+	fmt.Printf(StringGreen(data...))
 }
