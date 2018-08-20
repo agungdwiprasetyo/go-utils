@@ -79,6 +79,7 @@ func ParseTime(strs ...string) (t time.Time, err error) {
 	return
 }
 
+// ParseDateString for convert date (time.Time data type) to string
 func ParseDateString(date time.Time) string {
 	var day, month = fmt.Sprint(date.Day()), fmt.Sprint(int(date.Month()))
 	if date.Day() < 10 {
@@ -90,6 +91,7 @@ func ParseDateString(date time.Time) string {
 	return fmt.Sprintf("%s-%s-%d", day, month, date.Year())
 }
 
+// ParseDateFormat for convert date (in string format) to indonesian date format (ex: 1993-08-28 convert to 28 August 1993)
 func ParseDateFormat(date string) string {
 	dt, _ := ParseTime(date)
 	return fmt.Sprintf("%d %s %d", dt.Day(), dt.Month().String(), dt.Year())
