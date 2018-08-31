@@ -4,73 +4,58 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"runtime"
 	"strings"
 )
 
-type Debug struct {
-	Mark string
+func getCaller(i int) string {
+	_, file, line, _ := runtime.Caller(i)
+	paths := strings.Split(file, "/")
+	n := len(paths) - 2
+	if n < 0 {
+		n = 0
+	}
+	path := strings.Join(paths[n:], "/")
+	return fmt.Sprintf("%s:%d", path, line)
 }
 
-func New(mark string) *Debug {
-	return &Debug{Mark: mark}
+// Println for show data with stack trace
+func Println(data ...interface{}) {
+	var str []string
+	for _, val := range data {
+		valStr := fmt.Sprint(val)
+		if valStr == "" {
+			valStr = stringYellow(1, "<empty_string>")
+		} else {
+			valStr = stringRed(6, valStr)
+		}
+		str = append(str, valStr)
+	}
+	caller := stringGreen(1, fmt.Sprintf("%s >>", getCaller(2))) //fmt.Sprintf("\x1b[32;1m%s >>\x1b[0m", getCaller(2))
+	messages := strings.Join(str, stringGreen(1, " | "))
+	fmt.Printf("%s %s\n", caller, messages)
 }
 
-func (this *Debug) PrettyJSON(data interface{}) {
+// PrintJSON for show data in pretty JSON with stack trace
+func PrintJSON(data interface{}) {
 	buff, _ := json.Marshal(data)
 	var prettyJSON bytes.Buffer
-	json.Indent(&prettyJSON, buff, "", "\t")
-	// log.Printf("%s: %s", name, string(prettyJSON.Bytes()))
-	fmt.Printf("\x1b[33;1mDebugger: \x1b[0m")
-	fmt.Printf("\x1b[33;1m%s:\x1b[0m\n", this.Mark)
-	fmt.Printf("\x1b[32;1m%s\x1b[0m\n", string(prettyJSON.Bytes()))
-	fmt.Println("\x1b[33;1m=======================================\x1b[0m")
+	json.Indent(&prettyJSON, buff, "", "     ")
+	fmt.Println(stringYellow(5, "==================================================="))
+	fmt.Println(stringRed(6, fmt.Sprintf("Trace\t : %s", getCaller(2))))
+	fmt.Println(stringRed(6, "Data\t :"))
+	fmt.Println(stringGreen(1, string(prettyJSON.Bytes())))
+	fmt.Println(stringYellow(5, "==================================================="))
 }
 
-func (this *Debug) PrintRed(data interface{}) {
-	fmt.Printf("\x1b[31;1m%s >>> %v\x1b[0m\n", this.Mark, data)
+func stringRed(fontType int, data interface{}) string {
+	return fmt.Sprintf("\x1b[31;%dm%+v\x1b[0m", fontType, data)
 }
 
-func PrettyJSON(data interface{}) string {
-	buff, _ := json.Marshal(data)
-	var prettyJSON bytes.Buffer
-	json.Indent(&prettyJSON, buff, "", "\t")
-	// log.Printf("%s: %s", name, string(prettyJSON.Bytes()))
-	return fmt.Sprintf("\x1b[32;1m%s\x1b[0m", string(prettyJSON.Bytes()))
+func stringYellow(fontType int, data interface{}) string {
+	return fmt.Sprintf("\x1b[33;%dm%+v\x1b[0m", fontType, data)
 }
 
-func StringRed(data ...interface{}) string {
-	var str []string
-	for _, val := range data {
-		str = append(str, fmt.Sprint(val))
-	}
-	return fmt.Sprintf("\x1b[31;1m%v\x1b[0m\n", strings.Join(str, " >> "))
-}
-
-func StringYellow(data ...interface{}) string {
-	var str []string
-	for _, val := range data {
-		str = append(str, fmt.Sprint(val))
-	}
-	return fmt.Sprintf("\x1b[33;1m%v\x1b[0m\n", strings.Join(str, " >> "))
-}
-
-func StringGreen(data ...interface{}) string {
-	var str []string
-	for _, val := range data {
-		str = append(str, fmt.Sprint(val))
-	}
-	return fmt.Sprintf("\x1b[32;1m%v\x1b[0m\n", strings.Join(str, " >> "))
-}
-
-func PrintRed(data ...interface{}) {
-	str := StringRed(data...)
-	fmt.Printf(str)
-}
-
-func PrintYellow(data ...interface{}) {
-	fmt.Printf("\x1b[33;1m%v\x1b[0m\n", StringYellow(data...))
-}
-
-func PrintGreen(data ...interface{}) {
-	fmt.Printf(StringGreen(data...))
+func stringGreen(fontType int, data interface{}) string {
+	return fmt.Sprintf("\x1b[32;%dm%+v\x1b[0m", fontType, data)
 }
