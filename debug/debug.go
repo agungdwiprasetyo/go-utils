@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"runtime"
 	"strings"
+	"time"
 )
 
 func getCaller(i int) string {
@@ -27,13 +28,18 @@ func Println(data ...interface{}) {
 		if valStr == "" {
 			valStr = stringYellow(1, "<empty_string>")
 		} else {
-			valStr = stringRed(6, valStr)
+			valStr = stringGreen(1, valStr)
 		}
 		str = append(str, valStr)
 	}
-	caller := stringGreen(1, fmt.Sprintf("%s >>", getCaller(2))) //fmt.Sprintf("\x1b[32;1m%s >>\x1b[0m", getCaller(2))
-	messages := strings.Join(str, stringGreen(1, " | "))
-	fmt.Printf("%s %s\n", caller, messages)
+	messages := strings.Join(str, stringYellow(1, " | "))
+
+	fmt.Println(stringYellow(5, "==================================================="))
+	fmt.Println(stringRed(6, fmt.Sprintf("Trace\t : %s", getCaller(2))))
+	fmt.Println(stringRed(6, fmt.Sprintf("Time\t : %v", time.Now())))
+	fmt.Println(stringRed(6, "Data\t :"))
+	fmt.Println(stringGreen(1, messages))
+	fmt.Println(stringYellow(5, "==================================================="))
 }
 
 // PrintJSON for show data in pretty JSON with stack trace
@@ -43,6 +49,7 @@ func PrintJSON(data interface{}) {
 	json.Indent(&prettyJSON, buff, "", "     ")
 	fmt.Println(stringYellow(5, "==================================================="))
 	fmt.Println(stringRed(6, fmt.Sprintf("Trace\t : %s", getCaller(2))))
+	fmt.Println(stringRed(6, fmt.Sprintf("Time\t : %v", time.Now())))
 	fmt.Println(stringRed(6, "Data\t :"))
 	fmt.Println(stringGreen(1, string(prettyJSON.Bytes())))
 	fmt.Println(stringYellow(5, "==================================================="))
