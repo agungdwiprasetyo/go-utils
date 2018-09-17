@@ -274,3 +274,33 @@ func RemoveEmptyString(src []string) (res []string) {
 	}
 	return
 }
+
+// ValidateModel for common model validator
+/*
+example struct:
+type foo struct {
+	field1 string `json:"field" required:"true"`
+}
+*/
+func ValidateModel(data interface{}) error {
+	ref := reflect.ValueOf(data)
+	if ref.Kind() == reflect.Ptr {
+		ref = ref.Elem()
+	}
+
+	refType := ref.Type()
+	for i := 0; i < ref.NumField(); i++ {
+		val := ref.Field(i).Interface()
+
+		required := refType.Field(i).Tag.Get("required")
+		json := refType.Field(i).Tag.Get("json")
+		json = strings.TrimRight(json, ",omitempty")
+
+		isRequire, _ := strconv.ParseBool(required)
+		isEmptyValue := reflect.DeepEqual(val, reflect.Zero(reflect.TypeOf(val)).Interface())
+		if isEmptyValue && isRequire {
+			return fmt.Errorf("%v is mandatory", json)
+		}
+	}
+	return nil
+}
