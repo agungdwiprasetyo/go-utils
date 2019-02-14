@@ -3,8 +3,16 @@ sudo: required
 go:
   - 1.8.5
 
+env:
+  global:
+    - CODECOV_TOKEN="4302863f-1334-4bf5-b81a-1488704c3c9e"
+
 before_install:
   - export PATH=$PATH:$HOME/.local/bin
 
 script:
   - make test
+  - make cover
+
+after_success:
+  - bash <(curl -s https://codecov.io/bash)
