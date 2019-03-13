@@ -12,6 +12,9 @@ func TestMultiError(t *testing.T) {
 	if multiError.IsNil() == true {
 		t.Errorf("should not nil, got: %v", multiError.IsNil())
 	}
+	if multiError.HasError() == false {
+		t.Errorf("should true, got: %v", multiError.HasError())
+	}
 	errMap := multiError.ToMap()
 	if len(errMap) != 1 {
 		t.Errorf("unexpected, got: %d", len(errMap))

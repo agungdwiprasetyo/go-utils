@@ -22,6 +22,11 @@ func (m *MultiError) Append(key string, err error) {
 	}
 }
 
+// HasError check if err is exist
+func (m *MultiError) HasError() bool {
+	return len(m.errs) != 0
+}
+
 // IsNil check if err is nil
 func (m *MultiError) IsNil() bool {
 	return len(m.errs) == 0
