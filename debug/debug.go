@@ -11,13 +11,7 @@ import (
 
 func getCaller(i int) string {
 	_, file, line, _ := runtime.Caller(i)
-	paths := strings.Split(file, "/")
-	n := len(paths) - 2
-	if n < 0 {
-		n = 0
-	}
-	path := strings.Join(paths[n:], "/")
-	return fmt.Sprintf("%s:%d", path, line)
+	return fmt.Sprintf("%s:%d", file, line)
 }
 
 // Println for show data with stack trace
@@ -37,7 +31,7 @@ func Println(data ...interface{}) {
 	// fmt.Println(stringYellow(5, "==================================================="))
 	fmt.Println(stringGreen(1, fmt.Sprintf("Trace\t : %s", getCaller(2))))
 	fmt.Println(stringGreen(1, fmt.Sprintf("Time\t : %v", time.Now())))
-	fmt.Println(stringGreen(1, "Data\t :"))
+	fmt.Println(stringGreen(1, "Output\t :"))
 	fmt.Println(stringRed(6, messages))
 	fmt.Println(stringYellow(5, "---------------------------------------------------"))
 }
