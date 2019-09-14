@@ -3,7 +3,10 @@ package utils
 import (
 	"fmt"
 	"strings"
+	"sync"
 )
+
+var lock sync.Mutex
 
 // MultiError model
 type MultiError struct {
@@ -16,10 +19,13 @@ func NewMultiError() *MultiError {
 }
 
 // Append error to multierror
-func (m *MultiError) Append(key string, err error) {
+func (m *MultiError) Append(key string, err error) *MultiError {
+	lock.Lock()
+	defer lock.Unlock()
 	if err != nil {
 		m.errs[key] = err.Error()
 	}
+	return m
 }
 
 // HasError check if err is exist
